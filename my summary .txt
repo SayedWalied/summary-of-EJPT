@@ -1,0 +1,340 @@
+
+passive :collect the information and footprinting and data without interactive with target
+active:collect the information and footprinting and data with interactive with target
+
+
+--------------------- 
+
+
+
+website recon and footprinting(passive information gathering)
+
+
+
+host domain name   ---> tool for kali dnslook up
+https://domain.com/robots.txt  -------> text contain disallow pages that  tell search engine not show for users
+https://domain.com/sitemap.xml---> conatnis map of all pages belongs to website
+
+whatweb      domain name  ---> tool for kali domain footprinting
+___________________________________________________________________________________________________________
+ website recon and footprinting(passive information gathering)
+https/netcraft -------> footprinting
+
+________________________________________________________________________
+DNS recon(passive information gathering)
+
+dnsrecon -d domain name ->tool for kali dns enumertion
+
+https://dnsdumpster.com __> dns recon 
+
+zonetransfer.com --->website for test
+________________________________________________________________________
+WAF (passive information gathering)
+wafwOOf domain name --> tool web application firewall detection
+
+________________________________________________________________________
+subdomain enumertion 
+
+sublis3r tool
+__________________________________________________________________________________________________________________
+Google Dorks
+
+
+_________________________________________________________
+Email harvesting (passive information gathering)
+
+theharvester -d cisco  -b google  _____> harvest email address from domain by google
+__________________________________________________________
+ password leaked 
+https:haveibeenpwned.com
+
+
+____________________________________________________________________________
+DNS Zone transfer (Active information gathering)
+ defntion:user copy or transfer dns data to another
+dnsenum domain name
+
+____________________________________________________________________________
+Host discovery with nmap (Active information gathering)
+
+sudo nmap -sn 192.168.1.0/24
+sudo netdiscover -i eth0 -r 192.168.1.0/24
+hping3 -I eth0 and choice any flag want crafted or nping --> tool make crafted packet
+____________________________________________________________________________________________________________________________________________________________
+cycle of exploit
+
+
+
+nmap used for ---- know alive host-->then know open ports->then know apllication of protocol-->the know vulnerbility of application--> then exploit
+ #in scan port result if filterd mean found firewall
+#in case  target reply closed port mean that it  replay for scan with RST
+#in case  target reply open port mean that it replay for scan with SYN/ACK
+ _______________________________________________________________________________________
+-SI (ideal scan) make scan with another device in network
+-n --> no dns resloution (no resolving)
+-sA -> Ack scan if send and target dont responce that mean found firewall
+-p- -> scan for 65540 port
+-sU --> search udp ports
+_______________________________________________________________________________
+Banner grabing another way to know open service by(nc, netcat,telnet)
+netcat 192.168.1.16 22
+if open responce with version of service
+
+nmap -sV -n 192.168.1.16 --> service detection and  know version of applicaton that operate service
+__________________________________________________________________________
+Active OS finger print
+ 
+nmap -O -n 192.168.1.16 
+if result of operating system not sure for it 
+use nmap -A -n 192.168.1.16 
+-A ----> OS detection and traceroute and version and  get match script with service 
+
+-----------------------------------
+Passive OS finger print
+depend on analyse capture traffic by p0f tool that listining
+p0f -i eth0 
+____________________________________________________________________________
+Firewall and IDS Evasion
+
+-sS --> syn scan (half tcp conection)
+by 4 tecqnques
+1. fregmentation -->is used to splitting one packet to small packets
+by -f option ---> nmap -sS -f 192.168.1.16 
+
+--------------------------------------------------------------------
+2.Decoys---> send scan by more diffrent spoofed ip to try avoid IDS
+nmap -sS -D [decoy ip1],[decoy ip3],[decoy ip3],ME,[target]
+nmap -sS -D 192.168.1.3,192.168.1.1,ME,192.168.1.23[target]
+------------------------
+3.timing --> send packet with diffrent interval time
+nmap -sS 192.168.1.16 -T1
+-T0 send scan after 5 min
+-T1 send scan after 15 sec
+-T2 send scan after 0.4sec
+-T3 send scan after normal
+------------------------
+4.source ports --> misconfigratin in firewall
+nmap -g 53 -sS -p53 192.168.1.16
+ -g mean this is my source port 
+
+________________________________________________________________________________________________________________________
+ENUmertion   --> used to gather informationn from devices in the network such as account name -shares-misconfigured services 
+used specially when found netbios and snmb port open
+
+netbois--->protocol used to make windows system shares folders and printer and allow application in diffrent system to communicate with each other
+ devide to 
+1.nameservice in port 137 udp  used to link name  of pc with it ip
+2.datagram service in port 138 udp used to sending massage between devices 
+3. session service in port 139 tcp used to macke stablish connection between tow divces
+ sMB  port 445 is protocol share between devices  to work need netbios
+
+ #when scaning search for 137,139 ,445 ports in devices that mean netbios open
+ #nbtstat -A target ip this comand in windows after know netbios open in it
+
+if dont know ip but know name of pc write -a
+
+when see in result 20 number mean this folder share enabled
+
+net view command in windows to show who is share files
+smbclient command in lunix to show who is share files
+net user command in windows to take copy of partion in my device in new partion
+mount command in lunix to to take copy of partion in my device in new partion
+
+
+null session -> access share files  without password in case found adminstratve hidden files such as IP$
+netuse  \\192.168.1.16\IP$ "" /u:""
+ winfingerprit --> tool in windows make null session
+winfo --> tool in lunix make null session      --> winfo target ip -n
+ enum4lunix--> tool in lunix make enumeration
+rpcclient --> tool in lunix make enumeration
+
+------------------------------------------------
+
+smbmap --> tool in lunix make enumeration
+------------------------------------------------------------------------------------------------ 
+Snmb------> protocol used to gather information from devices network and configured them
+______________________________________________________________________________________________________________________________________________________
+valunerability assestment:
+1. manual by comands--> example test webapplication or aplication special for your company 
+2.valunerability scaner software-----> used database of known security to detect valunerability in system discover it by signeture of every valunerability and always must be up to date
+example ---> openvas-nexpose and the most popular is Nessus 
+
+_________________________________________________________________________________________________________________________________________________
+In metasploite can used  tool caled searchsploite to search for version of service want exploit it 
+_________________________________________________________________________________________________________________________________________________
+
+System host attack --> valunerabilites that found in operating systems such as windows and lunix
+
+-------------------------------------------
+
+(first WINDOWS)
+.Types of windows valunerability
+1. information disclosure--> valunerability allow to attacker to access confidinal data 
+2.Bufferover vlow ---> a programming error allow to attacker to write data in memory
+3.Remote code execution -->valunerability allow to attacker to remote code exute on target
+4.Privlavge escalation
+5.DOS
+----------------------------------------------
+WEB Dav valunerability  IIS server
+to show folder puplic in server to found web dav extention--> nmap -script http-enum -sV -p 80 192.168.1.16 
+
+davtest tool --url http://
+cadver--> tool used to download or upload files for target
+_________________________________________________________________________________________________________________________________________________
+ famous Valunerabilty SMP protocol (Eternal Blue) MS170
+ SMB port 445--> protocl sharing in network  for windows deviceslan work with netbios
+in Msf auxilary smb smb login to brute force username and pass to used in Psexec 
+ PSexec --> protocol used insted of telnet to control windows machines CMD found only in windows work with SMP protocol
+ Samba  protocl sharing in network  for lunix devices
+_________________________________________________________________________________________________________________________________________________
+famous Valunerabilty RDP protocol ( Blue Keep)--> valunerbilty allow attacker to control memory of device caused crashed system
+RDP in windows devices protocol 3389
+
+xfreerdp CMD program to conect windows device from lunix device 
+xfeedrp /u:username /p:pass /v:IP target:port rdp
+rdesktop to conect windows device from lunix device but neet connect network
+-->when make scan fingerprint to see open port if not found 3389 port but found port close to it can  sure if it is or not by module in MSF
+auxiliry\scanner\rdp\rdpscanner
+then set port that want sure
+
+
+to brute force creditionatal used  hydra tool 
+_________________________________________________________________________________________________________________________________________________
+WINRM port 5985-86 --> windows remote management used to execute comands on windows devices remotly
+in MSF use module auxiliry/scaner/winrm_login
+and used dictionary to brute force credentials
+(in metaspliot Auxiliry module not used to expliot but to help to get credentials or scan then used exploit module)
+(in metaspliot expliot module used to exploit valunerbilty )
+
+
+_________________________________________________________________________________________________________________________________________________
+windows kernal -->the heart of system that translation between hardware and software caled windows NT
+indivde to
+1.user mode  not acess all features in system 
+2.kernal mode access all features in system
+
+windows-exploit-suggester--> tool used to get valunerability of kernal system
+
+UACME---> tool used to privlage esclation and contaion 60 exploit to skip UAC(user account control)
+must to use tool you should exploit the target first then upload it on victim machine
+
+getuid
+sysinfo
+getsystem
+searchsploit in MSF to search for valunerability
+mosule multi handler in MSF used to recive reverse connection from victum 
+migrate command in meterpreter to link it with normal process
+ps -S service to get pid
+_________________________________________________________________________________________________________________________________________________
+Access tokens---> temprory key to access services wants credantials instade of enter it every time
+winlogin.exe---> respensible to generate key token
+--token divide to
+1.imporsnate level---->login on system such as domain
+2.delegate level --->login windows ,RDP
+
+incognito module in MSF to take tokens useful for privlage esclation
+
+in meterpreter session  write command (load incognito) then (list_tokens -u) to show avalible tokens
+then to take token write(impersonate_token name of token such as attck\\adminstrator)
+_________________________________________________________________________________________________________________________________________________
+Altrnate data streem (ADS)  it is belongs to NTFS
+NTFS --> system for storing files in windows
+NTFS indevide to 
+1.Dtat streem --> contains data of files
+2.Resource streem--> contains metadata of files  (information about it)
+
+Attaker used ADS to hide malicious code or executable in files to evade detection
+__________________________________________________________________________________________________
+windows password hash
+store hash  in SAM file
+type of hash
+LM   not used now 
+NTLM  that used now
+
+SAMfile-->responsible for manging user accounts and passwords stored it as database hashed 
+LM --> used DES algoirthm to encrypted password
+NTLM--> used collection of authenaction algoirthms encrybted password using MD4 hash and disposed from cleartext password
+lsass.exe-->process respensable for passwords and validation
+
+migrate -N lsass.exe
+_________________________________________________________________________________________________________________________________________________________________
+_ searching password for configrution files --> such as C:\Windows\Panther\Unattend.xml 
+mimkats --->tools to extract hashes in meterpreter called kiwi
+pass the hash--->technque used to skip the password by hash that get such as psexec module in msf
+
+
+powersploit --> post-exploitation framework in windows it is collection of powershell modulescan help pentester during phase assesment
+ used module priv poerup.ps file to get configrution files 
+
+
+ exploit/windows/misc/hta_server --->module in msf genertae link take it and open it in victim machine in cmd write mshta.exe link that open revrse tcp connection with you 
+
+ 
+load kiwi in meterpreter
+_________________________________________________________________________________________________________________________________________________________________
+System host attack
+Second Lunix system
+
+distrowatch website to see all distribution of lunix
+ 
+unix-->lunix and macOS
+unix first system then man called lunis take it and developed source code and invted lunix system
+
+lunix -->main distrbution 
+1.Depian
+2.Redhat
+3.Android
+other distrbuion depnded on
+
+type of  famous GUI in lunix(KDE plasma-Genom)
+CLI -->command line intrface  refere to software called shell
+shell--> in lunix Bash and in windows cmd
+
+
+
+__________________________________________________________________________________________________
+steps of exploit
+1. nmap ip then  for example if found http open 
+2. nmap -sV -p80 ip for exmple result  name of service bad blue http 2.1
+3. use searchsploit bad blue 2.1 to show all avlible exploits then choose explit end with.py or rb extention
+
+ 
+hydra tool used to brute force attack such as ftp and ssh and any service work with authenication username and password
+ in msf auxialry /scanner/ssh/ssh_login to brute force
+so you can exploit manuall by tools or by modules in MSF
+
+
+smpmap--> tool to show share files
+smpclient--->tool to show browseable files
+enum4lunix -->tool  to show user have files share and SID for user
+__________________________________________________________________________________________________
+lunix kernal exploit -> valunerability in kernal to execute code to privlaged esclation to get system shell
+by know valunerability kernal and downloading and transfaring kernal exploits on target system
+lunix-exploir-suggester -->tool detecting valunerability in system
+
+-----------------------------------------------------------------------------------------
+SUID exploit --> set owner user id allow when run any script as root or execute any program(rwsx)
+---------------------------------------------------------------------------------------------------------------
+lunix password hash find it in /etc/shadow
+found numbers next to every user tell us about type of hash
+$1-->MD5
+$2-->Blowfish
+$5-->sha256
+$6-->sha512
+
+string-->command tell you every thing about file get you
+
+__________________________________________________________________________________________________
+password hash  crack
+ after dump password 
+use module in MSF 4.auxilary/analyze/crack_lunix
+
+1.nmap --script vuln -p portnumper ip
+
+2./etc/init.d/postgresql start to store all scan and check
+
+3.post/lunix/gather/hashdump
+_________________________________________________________________________________________________
+__________________________________________________________________________________________________
+__________________________________________________________________________________________________ 
+
